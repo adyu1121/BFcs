@@ -1,10 +1,10 @@
-﻿namespace BrainFuck
+namespace BrainFuck
 {
     enum error
     {
         LoopisNotEnd = 1, LoopisNotStart = 2,
-        indexError = 3, indexMax = 4,
-        overflow = 5, underflow = 6,
+        indexError = 3,indexMax = 4,
+        overflow = 5,underflow = 6,
         CodeEnd = 7
     }
     class bf
@@ -80,10 +80,10 @@
         {
             index = 0;
             Pointer = 0;
-            Array.Fill(Memory, 0);
+            Array.Fill(Memory,0);
             LoopStack.Clear();
         }
-        public void Run()
+        public bool Run()
         {
             int _Point = 0;
             long[] _Memory = new long[32768];
@@ -93,15 +93,19 @@
                 switch (BFCode[_index])
                 {
                     case symbolList.Plus:
+                        if (Memory[Pointer] == long.MaxValue) return false;
                         _Memory[_Point]++;
                         break;
                     case symbolList.Minus:
+                        if (Memory[Pointer] == long.MinValue) return false;
                         _Memory[_Point]--;
                         break;
                     case symbolList.PointUp:
+                        if (_Point == 32767) return false;
                         _Point++;
                         break;
                     case symbolList.PointDown:
+                        if (_Point == 0) return false;
                         _Point--;
                         break;
                     case symbolList.Input:
@@ -121,27 +125,31 @@
                             while (true)
                             {
                                 _index++;
+                                if (_index > BFCode.Count - 1) return false;
                                 if (BFCode[_index] == symbolList.LoopStart)
                                 {
                                     NestedLoopCount++;
                                 }
                                 if (BFCode[_index] == symbolList.LoopEnd)
                                 {
+
                                     if (NestedLoopCount != 0)
                                     {
                                         NestedLoopCount--;
                                     }
-                                    else break;
+                                     else break;
                                 }
                             }
                         }
                         break;
                     case symbolList.LoopEnd:
+                        if (_LoopStack.Count == 0) return false;
                         _index = _LoopStack.Pop() - 1;
                         break;
                 }
             }
-
+            if(_LoopStack.Count != 0) return false;
+            return true;
         }
         public bool Stap(out error errorCode)
         {
@@ -179,7 +187,7 @@
                     Memory[Pointer]--;
                     break;
                 case symbolList.PointUp:
-                    if (Pointer == 32768)
+                    if (Pointer == 32767)
                     {
                         errorCode = error.indexMax;
                         return false;
@@ -232,8 +240,7 @@
                     }
                     break;
                 case symbolList.LoopEnd:
-                    if (LoopStack.Count == 0)
-                    {
+                    if(LoopStack.Count == 0) {
                         errorCode = error.LoopisNotStart;
                         return false;
                     }
