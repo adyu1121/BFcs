@@ -40,7 +40,10 @@ namespace BrainFuck
                 init();
                 foreach (char ch in value)
                 {
-                    BFCode.Add((symbolList)ch);
+                    if (ch == '+'|| ch == '-' || ch == '<' || ch == '>' || ch == '.' || ch == ',' || ch == '[' || ch == ']')
+                    {
+                        BFCode.Add((symbolList)ch);
+                    }
                 }
             }
         }
